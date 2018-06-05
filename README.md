@@ -19,4 +19,17 @@ Afin de facilité l'indexation des stations, l'id sera attribuer dans l'ordre al
     CREATE INDEX ON :Station(name);
 ```
 
+On peut maintenant passer à l'import des stations :
+```
+LOAD CSV WITH HEADERS FROM "file:///positions-geographiques-des-stations-du-reseau-ratp.csv" as row
+MERGE (s:Station{id:row.stop_id})
+ON CREATE SET s.name = row.stop_name,
+              s.address=row.stop_desc,
+              s.coordonnee=row.coord,
+              s.latitude=row.stop_lat,
+              s.longitude=row.stop_lon,
+              s.code=row.code_INSEE,
+              s.departement=row.departement
+```
+
 
