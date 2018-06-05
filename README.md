@@ -9,13 +9,8 @@ Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://
   - Les informations sur l'[ensemble des lignes](http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip) du réseau
   - Les [positions des stations](https://data.ratp.fr/explore/dataset/positions-geographiques-des-stations-du-reseau-ratp/download/?format=csv&timezone=Europe/Berlin&use_labels_for_header=true)
 
-<<<<<<< HEAD
- ## Étape 1 - Ajout des stations
-Pour s'assurer que chaque station est unique, on ajout la contrainte suivante :
-=======
  ## Etape 1 - Ajout des stations
 Pour s'assurer que chaque station est unique, on ajoute la contrainte suivante :
->>>>>>> 6d974e2b7562bdd0f1fbf981ce10b50526625757
 ```php
     CREATE CONSTRAINT ON (s:Station) ASSERT s.id is unique;
 ```
