@@ -30,6 +30,8 @@ ON CREATE SET s.name = row.stop_name,
               s.longitude = row.stop_lon,
               s.code = row.code_INSEE,
               s.departement = row.departement
-```
 
+```
+La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
+![Graph with all the stations](https://octodex.github.com/images/yaktocat.png)
 
