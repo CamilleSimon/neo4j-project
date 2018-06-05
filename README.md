@@ -11,7 +11,7 @@ Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://
 
  ## Etape 1 - Ajout des stations
 Pour s'assurer que chaque station est unique, on ajout la contrainte suivante :
-```
+```cypher
     CREATE CONSTRAINT ON (s:Station) ASSERT s.id is unique;
 ```
 Afin de facilité l'indexation des stations, l'id sera attribuer dans l'ordre alphabétique du nom des stations.
@@ -20,7 +20,7 @@ Afin de facilité l'indexation des stations, l'id sera attribuer dans l'ordre al
 ```
 
 On peut maintenant passer à l'import des stations :
-```
+```cypher
 LOAD CSV WITH HEADERS FROM "file:///positions-geographiques-des-stations-du-reseau-ratp.csv" as row
 MERGE (s:Station{id:row.stop_id})
 ON CREATE SET s.name = row.stop_name,
