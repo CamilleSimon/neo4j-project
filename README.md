@@ -6,8 +6,8 @@ Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://
 - [Neo4j](https://neo4j.com/download/)
 - Le plugin [Graph algorithms](https://github.com/neo4j-contrib/neo4j-graph-algorithms/)
 - Les fichiers RATP suivants :
- - Les informations sur l'[ensemble des lignes](http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip) du réseau
- - Les [positions des stations](https://data.ratp.fr/explore/dataset/positions-geographiques-des-stations-du-reseau-ratp/download/?format=csv&timezone=Europe/Berlin&use_labels_for_header=true)
+  - Les informations sur l'[ensemble des lignes](http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip) du réseau
+  - Les [positions des stations](https://data.ratp.fr/explore/dataset/positions-geographiques-des-stations-du-reseau-ratp/download/?format=csv&timezone=Europe/Berlin&use_labels_for_header=true)
 
  ## Etape 1 - Ajout des stations
 Pour s'assurer que chaque station est unique, on ajout la contrainte suivante :
