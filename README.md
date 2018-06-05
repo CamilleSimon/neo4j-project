@@ -9,17 +9,22 @@ Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://
   - Les informations sur l'[ensemble des lignes](http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip) du réseau
   - Les [positions des stations](https://data.ratp.fr/explore/dataset/positions-geographiques-des-stations-du-reseau-ratp/download/?format=csv&timezone=Europe/Berlin&use_labels_for_header=true)
 
+<<<<<<< HEAD
  ## Étape 1 - Ajout des stations
 Pour s'assurer que chaque station est unique, on ajout la contrainte suivante :
+=======
+ ## Etape 1 - Ajout des stations
+Pour s'assurer que chaque station est unique, on ajoute la contrainte suivante :
+>>>>>>> 6d974e2b7562bdd0f1fbf981ce10b50526625757
 ```php
     CREATE CONSTRAINT ON (s:Station) ASSERT s.id is unique;
 ```
-Afin de facilité l'indexation des stations, l'id sera attribuer dans l'ordre alphabétique du nom des stations :
+Afin de faciliter l'indexation des stations, l'id sera attribué dans l'ordre alphabétique du nom des stations :
 ```php
     CREATE INDEX ON :Station(name);
 ```
 
-On peut maintenant passer à l'import des stations :
+On peut maintenant passer à l'ajout des stations :
 ```php
 LOAD CSV WITH HEADERS FROM "file:///positions-geographiques-des-stations-du-reseau-ratp.csv" as row
 MERGE (s:Station{id:row.stop_id})
