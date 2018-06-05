@@ -37,6 +37,8 @@ La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
 
 ![Graph with all the stations](https://github.com/CamilleSimon/neo4j-project/blob/master/graph.png)
 
+***Remarque*** : Les identifiants des stations sont des chaînes de caractères et non des entiers !
+
 ## Étape 2 - Ajout des connexions entre les stations
 Il n'y a pas sur le site de la RATP de fichiers permettant directement d'ajouter les liaisons entre les stations. Afin d'avoir quelque chose de similaire au tutoriel du métro de Londre, nous devons créer les fichiers nécessaires.
 
