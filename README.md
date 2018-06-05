@@ -33,5 +33,5 @@ ON CREATE SET s.name = row.stop_name,
 
 ```
 La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
-![Graph with all the stations](https://octodex.github.com/images/yaktocat.png)
+![Graph with all the stations](https://github.com/CamilleSimon/neo4j-project/blob/master/graph.png)
 
