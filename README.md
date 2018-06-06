@@ -71,8 +71,8 @@ USING PERIODIC COMMIT 800
 LOAD CSV WITH HEADERS FROM "file:///RATP_GTFS_METRO_1/stop_times.csv" as row
 CREATE (t:Travel)
 SET t.trip_id = toInteger(row.trip_id),
-              t.arrival_time = apoc.date.parse(row.departure_time,'m','HH:mm:ss'),
-              t.departure_time = apoc.date.parse(row.departure_time,'m','HH:mm:ss'),
+              t.arrival_time = toInteger(apoc.date.parse(row.departure_time,'m','HH:mm:ss')),
+              t.departure_time = toInteger(apoc.date.parse(row.departure_time,'m','HH:mm:ss')),
               t.stop_id = toInteger(row.stop_id),
               t.stop_sequence = toInteger(row.stop_sequence)
 ```
@@ -84,9 +84,13 @@ MATCH (t2:Travel) WHERE t1.trip_id = t2.trip_id AND t2.stop_sequence = t1.stop_s
 MATCH (s1:Station) WHERE s1.stop_id = t1.stop_id
 MATCH (s2:Station) WHERE s2.stop_id = t2.stop_id
 MERGE (s1)-[m:M1]->(s2) 
-ON CREATE SET m.nb = 1, m.time = t2.arrival_time-t1.departure_time
-ON MATCH SET m.nb = m.nb + 1, m.time = (m.time + t2.arrival_time-t1.departure_time) / m.nb
-RETURN s1, m.time, s2
+ON CREATE SET m.nb = 1, m.time = toFloat(t2.arrival_time-t1.departure_time)
+ON MATCH SET m.nb = m.nb + 1, m.time = m.time + t2.arrival_time-t1.departure_time
+```
+
+Afin d'avoir la moyenne en minute de temps de trajet, on ajoute l'attribut `avg_time` sur chaque arrête :
+```php
+MATCH ()-[m:M1]-() SET m.avg_time = m.time / m.nb RETURN m
 ```
 
 *Remarque* : 
