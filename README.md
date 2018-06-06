@@ -14,7 +14,6 @@ Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://
 On utilise le fichier `positions-geographiques-des-stations-du-reseau-ratp.csv` qui contient notamment les noms des stations ainsi que l'identifiant qui va nous aider à céer les connexion entre les stations : `stop_id`.
 
 Chaque ligne du document va correspondre à un noeud de notre graphe. Pour créer les noeuds, on utilise le script suivant :
-On peut maintenant passer à l'ajout des stations :
 ```php
 LOAD CSV WITH HEADERS FROM "file:///positions-geographiques-des-stations-du-reseau-ratp.csv" as row
 CREATE (s:Station)
@@ -27,6 +26,7 @@ SET s.stop_id = toInteger(row.stop_id),
     s.code = row.code_INSEE,
     s.departement = row.departement
 ```
+
 La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
 
 
