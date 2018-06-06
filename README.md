@@ -62,7 +62,7 @@ MERGE (s1)<-[:PIED{time:row.min_transfer_time}]-(s2)
 Le fichier `stop_times.txt` est celui qui va nous interesser, chaque ligne du fichier est constituée de :
 trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,shape_dist_traveled
 
-Un déplacement entre deux stations corresponds au passage d'une ligne à l'autre.
+Un déplacement entre deux stations corresponds au passage d'une ligne du fichier à la suivante.
 Afin de simplifier le traitement, nous allons dand un premier temps enregistrer tous les arrêts à quai puis construire les déplacmeent entre deux quais.
 
 Extraction des informations sur l'arrivée et le départ des trains à quai :
