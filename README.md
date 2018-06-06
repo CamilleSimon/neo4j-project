@@ -22,27 +22,86 @@ Afin de faciliter l'indexation des stations, l'id sera attribué dans l'ordre al
 On peut maintenant passer à l'ajout des stations :
 ```php
 LOAD CSV WITH HEADERS FROM "file:///positions-geographiques-des-stations-du-reseau-ratp.csv" as row
-MERGE (s:Station{id:row.stop_id})
-ON CREATE SET s.name = row.stop_name,
-              s.address = row.stop_desc,
-              s.coordonnee = row.coord,
-              s.latitude = row.stop_lat,
-              s.longitude = row.stop_lon,
-              s.code = row.code_INSEE,
-              s.departement = row.departement
-
+CREATE (s:Station)
+SET s.stop_id = toInteger(row.stop_id),
+    s.name = row.stop_name,
+    s.address = row.stop_desc,
+    s.coordonnee = row.coord,
+    s.latitude = row.stop_lat,
+    s.longitude = row.stop_lon,
+    s.code = row.code_INSEE,
+    s.departement = row.departement
 ```
 La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
 
 
 ![Graph with all the stations](https://github.com/CamilleSimon/neo4j-project/blob/master/graph.png)
 
-***Remarque*** : Les identifiants des stations sont des chaînes de caractères et non des entiers !
-
 ## Étape 2 - Ajout des connexions entre les stations
-Il n'y a pas sur le site de la RATP de fichiers permettant directement d'ajouter les liaisons entre les stations. Afin d'avoir quelque chose de similaire au tutoriel du métro de Londre, nous devons créer les fichiers nécessaires.
+Les exmples suivants sont appliquer sur la ligne 1 du métro, pour créer le plan complet du métro de Paris, il faut répéter l'opération pour chacune des lignes.
 
-### Création des fichiers de liaison entre les stations
-Le dossier `RATP_GTFS_LINES` contient l'ensemble des informations disponibles sur chaque ligne. C'est à partir de ces fichiers que nous allons construire un document CSV avec la station de départ, la station d'arrivée, la ligne concernée ainsi que le temps moyen du trajet.
+### Liaisons entre les quais des stations
+Les `stop_id` sont les quais où s'arrête le métro, il y a donc plusieurs `stop` pour une même station.
+Commençons par créer les connexions entre les quais.
+```php
+MATCH(s1:Station)
+MATCH(s2:Station) WHERE s1.name=s2.name AND s1<>s2
+MERGE (s1)-[:MEMESTATION]->(s2)
+MERGE (s2)-[:MEMESTATION]->(s1)
+```
+
+### Liaisons à pied entre les stations
+Il existe des couloirs permettant de se déplacer d'une station à l'autre, cette information est dans le fichier `transfert.txt`.
+```php
+USING PERIODIC COMMIT 800
+LOAD CSV WITH HEADERS FROM "file:///RATP_GTFS_METRO_1/transfers.csv" as row
+MATCH (s1:Station{stop_id:toInteger(row.from_stop_id)})
+MATCH (s2:Station{stop_id:toInteger(row.to_stop_id)})
+MERGE (s1)-[:PIED{time:row.min_transfer_time}]->(s2)
+MERGE (s1)<-[:PIED{time:row.min_transfer_time}]-(s2)
+```
+
+### Liaisons entre les stations d'une même ligne
+Le dossier `RATP_GTFS_LINES` contient l'ensemble des informations disponibles sur chaque ligne. C'est à partir de ces fichiers que nous allons construire nos connexions entre les stations.
+
+Le fichier `stop_times.txt` est celui qui va nous interesser, chaque ligne du fichier est constituée de :
+trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,shape_dist_traveled
+
+Un déplacement entre deux stations corresponds au passage d'une ligne à l'autre.
+Afin de simplifier le traitement, nous allons dand un premier temps enregistrer tous les arrêts à quai puis construire les déplacmeent entre deux quais.
+
+Extraction des informations sur l'arrivée et le départ des trains à quai :
+```php
+USING PERIODIC COMMIT 800
+LOAD CSV WITH HEADERS FROM "file:///RATP_GTFS_METRO_1/stop_times.csv" as row
+CREATE (t:Travel)
+SET t.trip_id = toInteger(row.trip_id),
+              t.arrival_time = apoc.date.parse(row.departure_time,'m','HH:mm:ss'),
+              t.departure_time = apoc.date.parse(row.departure_time,'m','HH:mm:ss'),
+              t.stop_id = toInteger(row.stop_id),
+              t.stop_sequence = toInteger(row.stop_sequence)
+```
+
+Nous pouvons maintenant construire le déplacement entre deux arrêts :
+```php
+MATCH (t1:Travel)
+MATCH (t2:Travel) WHERE t1.trip_id = t2.trip_id AND t2.stop_sequence = t1.stop_sequence + 1
+MATCH (s1:Station) WHERE s1.stop_id = t1.stop_id
+MATCH (s2:Station) WHERE s2.stop_id = t2.stop_id
+MERGE (s1)-[:M1{time:t2.arrival_time-t1.departure_time}]->(s2)
+```
+
+//Une fois tous les déplacements entre les stations ajoutés au graphe, on peut supprimer les informations sur les arrivées et départs des trains :
+
+*Suppression des connexions en cas de fausse manipulation*
+```php
+MATCH ()-[r]-()
+DELETE r
+```
+
+## Pour aller plus loin
+- Ajouter les heures de départ et d'arrivée afin de prendre en compte les temps des correspondances
+- Fusionner les `stop_id` dans une liste. Chaque station aurai un nom unique et une liste de `stop_id`
+
 
 
