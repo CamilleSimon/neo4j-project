@@ -83,8 +83,14 @@ MATCH (t1:Travel)
 MATCH (t2:Travel) WHERE t1.trip_id = t2.trip_id AND t2.stop_sequence = t1.stop_sequence + 1
 MATCH (s1:Station) WHERE s1.stop_id = t1.stop_id
 MATCH (s2:Station) WHERE s2.stop_id = t2.stop_id
-MERGE (s1)-[:M1{time:t2.arrival_time-t1.departure_time}]->(s2)
+MERGE (s1)-[m:M1]->(s2) 
+ON CREATE SET m.nb = 1, m.time = t2.arrival_time-t1.departure_time
+ON MATCH SET m.nb = m.nb + 1, m.time = ((m.time + t2.arrival_time-t1.departure_time) / m.nb)
 ```
+
+*Remarque* : Sur certain trajet, le métro ne fait pas toutes les stations. Doit-on tout représenter ou seulement le chemin le plus long ?
+Ex : A-->C, A-->B, B-->C. Eliminer A-->B et B-->C ?
+Si on veut dans l'avenir calculer le temps de trajet entre deux stations, il est nécessaire de garder tous les trajets ainsi que leurs horaires de passages.
 
 //Une fois tous les déplacements entre les stations ajoutés au graphe, on peut supprimer les informations sur les arrivées et départs des trains :
 
