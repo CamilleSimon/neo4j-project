@@ -11,9 +11,9 @@ Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://
   - Les [positions des stations](https://data.ratp.fr/explore/dataset/positions-geographiques-des-stations-du-reseau-ratp/download/?format=csv&timezone=Europe/Berlin&use_labels_for_header=true)
 
 ## Étape 1 - Ajout des stations
-On utilise le fichier `positions-geographiques-des-stations-du-reseau-ratp.csv` qui contient notamment les noms des stations ainsi que l'identifiant qui va nous aider à céer les connexion entre les stations : `stop_id`.
+On utilise le fichier `positions-geographiques-des-stations-du-reseau-ratp.csv` qui contient notamment les noms des stations ainsi que l'identifiant qui va nous aider à céer les connexion entre les elles : `stop_id`.
 
-Chaque ligne du document va correspondre à un noeud de notre graphe. Pour créer les noeuds, on utilise le script suivant :
+Chaque ligne du document va correspondre à un noeud dans notre graphe. Pour créer les noeuds, on utilise le script suivant :
 ```php
 LOAD CSV WITH HEADERS FROM "file:///positions-geographiques-des-stations-du-reseau-ratp.csv" as row
 CREATE (s:Station)
@@ -33,10 +33,12 @@ La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
 ![Graph with all the stations](https://github.com/CamilleSimon/neo4j-project/blob/master/graph.png)
 
 ## Étape 2 - Ajout des connexions entre les stations
-Les exmples suivants sont appliquer sur la ligne 1 du métro, pour créer le plan complet du métro de Paris, il faut répéter l'opération pour chacune des lignes.
+Les exemples suivants sont appliqués sur la ligne 1 du métro, pour créer le plan complet du métro de Paris, il faut répéter l'opération pour chacune des lignes.
+
+Le dossier `RATP_GTFS_LINES` contient l'ensemble des informations disponibles sur chaque ligne. C'est à partir de ces fichiers que nous allons construire nos connexions entre les stations.
 
 ### Liaisons entre les quais des stations
-Les `stop_id` sont les quais où s'arrête le métro, il y a donc plusieurs `stop` pour une même station.
+Les `stop_id` sont les quais où s'arrête le métro. Il y au moins deux `stop_id` pour une même station, un pour chaque sens de circulation.
 Commençons par créer les connexions entre les quais.
 ```php
 MATCH(s1:Station)
@@ -46,7 +48,7 @@ MERGE (s2)-[:MEMESTATION]->(s1)
 ```
 
 ### Liaisons à pied entre les stations
-Il existe des couloirs permettant de se déplacer d'une station à l'autre, cette information est dans le fichier `transfert.txt`.
+Il existe des couloirs permettant de se déplacer d'une station à l'autre, cette information est dans le fichier `transfers.txt`.
 ```php
 USING PERIODIC COMMIT 800
 LOAD CSV WITH HEADERS FROM "file:///RATP_GTFS_METRO_1/transfers.csv" as row
@@ -57,8 +59,6 @@ MERGE (s1)<-[:PIED{time:row.min_transfer_time}]-(s2)
 ```
 
 ### Liaisons entre les stations d'une même ligne
-Le dossier `RATP_GTFS_LINES` contient l'ensemble des informations disponibles sur chaque ligne. C'est à partir de ces fichiers que nous allons construire nos connexions entre les stations.
-
 Le fichier `stop_times.txt` est celui qui va nous interesser, chaque ligne du fichier est constituée de :
 trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,shape_dist_traveled
 
