@@ -100,13 +100,11 @@ Sur certain trajet, le métro ne fait pas toutes les stations. Doit-on tout repr
 Ex : A-->C, A-->B, B-->C. Eliminer A-->B et B-->C ?
 Si on veut dans l'avenir calculer le temps de trajet entre deux stations, il est nécessaire de garder tous les trajets ainsi que leurs horaires de passages.
 
-//Une fois tous les déplacements entre les stations ajoutés au graphe, on peut supprimer les informations sur les arrivées et départs des trains :
+### Graphe de la ligne 1 du métro
+La commande `MATCH (n)-[:M1]-(m) RETURN n,m` nous permet de visualiser la ligne 1 du métro :
 
-*Suppression des connexions en cas de fausse manipulation*
-```php
-MATCH ()-[r]-()
-DELETE r
-```
+
+![Graph of M1](https://github.com/CamilleSimon/neo4j-project/blob/master/graph-metro1.png)
 
 ## Pour aller plus loin
 - Ajouter les heures de départ et d'arrivée afin de prendre en compte les temps des correspondances
