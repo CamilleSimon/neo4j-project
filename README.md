@@ -106,9 +106,16 @@ La commande `MATCH (n)-[:M1]-(m) RETURN n,m` nous permet de visualiser la ligne 
 
 ![Graph of M1](https://github.com/CamilleSimon/neo4j-project/blob/master/graph-metro1.png)
 
-## Pour aller plus loin
+## Idées d'amélioration
 - Ajouter les heures de départ et d'arrivée afin de prendre en compte les temps des correspondances
-- Fusionner les `stop_id` dans une liste. Chaque station aurai un nom unique et une liste de `stop_id`
+- Fusionner les `stop_id` dans une liste. Chaque station aurait un nom unique et une liste de `stop_id`
+- Que faire des triangulaires ? 
+
+## Références
+- L'exemple avec le métro londonnien : [https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/)
+- Calcul d'itinéraire depuis les données RATP en scala : [http://www.dericbourg.net/2015/12/10/calcul-ditineraire-a-partir-des-donnees-ratp/](http://www.dericbourg.net/2015/12/10/calcul-ditineraire-a-partir-des-donnees-ratp/)
+- Cours de M. Olivier [http://litis.univ-lehavre.fr/~dolivier/PagePerso/uploads/Enseignement/ReseauxInteraction/Neo4J.pdf](http://litis.univ-lehavre.fr/~dolivier/PagePerso/uploads/Enseignement/ReseauxInteraction/Neo4J.pdf)
+
 
 
 
