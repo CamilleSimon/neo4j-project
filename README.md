@@ -93,18 +93,27 @@ Afin d'avoir la moyenne en minute de temps de trajet, on ajoute l'attribut `avg_
 MATCH ()-[m:M1]-() SET m.avg_time = m.time / m.nb RETURN m
 ```
 
-*Remarque* : 
-
-Sur certain trajet, le métro ne fait pas toutes les stations. Doit-on tout représenter ou seulement le chemin le plus long ?
-
-Ex : A-->C, A-->B, B-->C. Eliminer A-->B et B-->C ?
-Si on veut dans l'avenir calculer le temps de trajet entre deux stations, il est nécessaire de garder tous les trajets ainsi que leurs horaires de passages.
-
 ### Graphe de la ligne 1 du métro
 La commande `MATCH (n)-[:M1]-(m) RETURN n,m` nous permet de visualiser la ligne 1 du métro :
 
-
 ![Graph of M1](https://github.com/CamilleSimon/neo4j-project/blob/master/graph-metro1.png)
+
+*Remarque* : 
+
+Sur certain trajet, le métro ne fait pas toutes les stations, on a alors la création de "triangulaire". Doit-on tout représenter ou seulement le chemin le plus long en nombre d'arrête ?
+Ex : A-->C, A-->B, B-->C. Eliminer A-->B et B-->C ?
+Si on veut dans l'avenir calculer le temps de trajet entre deux stations, il est nécessaire de garder tous les trajets ainsi que leurs horaires de passages mais le graphe est moins lisible. 
+
+Avec la commande suivante, on supprime les liaisons A-->C (triangulaire) :
+```php
+MATCH (n1:Station)-[p1:M1]->(m1:Station)
+MATCH (n2:Station)-[p2:M1*2]->(m2:Station) WHERE n1=n2 AND m1=m2
+DELETE p1
+```
+
+En généralisant pour toute les liaisons "n-aire", on obtient le graphe suivant :
+
+![Graph of M1 simplified](https://github.com/CamilleSimon/neo4j-project/blob/master/graph-metro1-2.png)
 
 ## Idées d'amélioration
 - Ajouter les heures de départ et d'arrivée afin de prendre en compte les temps des correspondances
