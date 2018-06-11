@@ -6,18 +6,19 @@ Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://
 - [Neo4j](https://neo4j.com/download/)
 - Le plugin [Graph algorithms](https://github.com/neo4j-contrib/neo4j-graph-algorithms/)
 - Le plugin [APOC](http://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/3.4.0.1)
-- Les fichiers RATP suivants :
-  - Les informations sur l'[ensemble des lignes](http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip) du réseau
-  - Les [positions des stations](https://data.ratp.fr/explore/dataset/positions-geographiques-des-stations-du-reseau-ratp/download/?format=csv&timezone=Europe/Berlin&use_labels_for_header=true)
+- Les informations sur l'[ensemble des lignes](http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip) du réseau RATP
+
+
+Les opérations suivantes sont à répéter pour chaque ligne de métro, nous ne présenterons que les commande pour la ligne 1.
 
 ## Étape 1 - Ajout des stations
-On utilise le fichier `positions-geographiques-des-stations-du-reseau-ratp.csv` qui contient notamment les noms des stations ainsi que l'identifiant qui va nous aider à céer les connexion entre les elles : `stop_id`.
+On utilise le fichier `stops.csv` qui contient notamment les noms des stations ainsi que l'identifiant qui va nous aider à céer les connexions entre-elles : `stop_id`.
 
-Chaque ligne du document va correspondre à un noeud dans notre graphe. Pour créer les noeuds, on utilise le script suivant :
+Chaque ligne du document correspond à un quai de métro, il y a deux quais sur une voie, un pour chaque sens de circulation. Un noeud dans notre graphe est donc un nom et un ensemble d'identifiant de quai. Pour créer les noeuds, on utilise le script suivant :
 ```php
-LOAD CSV WITH HEADERS FROM "file:///positions-geographiques-des-stations-du-reseau-ratp.csv" as row
-CREATE (s:Station)
-SET s.stop_id = toInteger(row.stop_id),
+LOAD CSV WITH HEADERS FROM "file:///RATP_GTFS_METRO_1/stops.csv" as row
+MERGE (s:Station{name:row.name})
+ON CREATE SET s.stop_M1_1 = toInteger(row.stop_id),
     s.name = row.stop_name,
     s.address = row.stop_desc,
     s.coordonnee = row.coord,
@@ -25,12 +26,17 @@ SET s.stop_id = toInteger(row.stop_id),
     s.longitude = row.stop_lon,
     s.code = row.code_INSEE,
     s.departement = row.departement
+ON MATCH SET s.stop_M1_2 = toInteger(row.stop_id)
 ```
 
 La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
 
 
 ![Graph with all the stations](https://github.com/CamilleSimon/neo4j-project/blob/master/graph.png)
+
+OU ----------------------------------------------------------
+Lecture à partir de `stops.csv`
+
 
 ## Étape 2 - Ajout des connexions entre les stations
 Les exemples suivants sont appliqués sur la ligne 1 du métro, pour créer le plan complet du métro de Paris, il faut répéter l'opération pour chacune des lignes.
