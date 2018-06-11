@@ -2,12 +2,13 @@
 
 Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/) mais portant sur le métro parisien.
 
+[TODO : Meilleur intro ! => Rappel du contexte + rapide présentation du travail réalisé sur le métro de Londre + présentation des objectifs du travail. Séparer en plsueirus fichiers ? 1.Intro 2.Tuto 3.Exo ?]
+
 ## Prérequis
 - [Neo4j](https://neo4j.com/download/)
 - Le plugin [Graph algorithms](https://github.com/neo4j-contrib/neo4j-graph-algorithms/)
-- Le plugin [APOC](http://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/3.4.0.1)
+- Le plugin [APOC](http://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/3.4.0.1) //Nécessaire pour la conversion en format date et la future upgrade temps-réel 
 - Les informations sur l'[ensemble des lignes](http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip) du réseau RATP
-
 
 Les opérations suivantes sont à répéter pour chaque ligne de métro, nous ne présenterons que les commande pour la ligne 1.
 
@@ -35,37 +36,11 @@ La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
 ![Graph with all the stations](https://github.com/CamilleSimon/neo4j-project/blob/master/graph.png)
 
 ## Étape 2 - Ajout des connexions entre les stations
-Les exemples suivants sont appliqués sur la ligne 1 du métro, pour créer le plan complet du métro de Paris, il faut répéter l'opération pour chacune des lignes.
 
-Le dossier `RATP_GTFS_LINES` contient l'ensemble des informations disponibles sur chaque ligne. C'est à partir de ces fichiers que nous allons construire nos connexions entre les stations.
-
-### Liaisons entre les quais des stations
-Les `stop_id` sont les quais où s'arrête le métro. Il y au moins deux `stop_id` pour une même station, un pour chaque sens de circulation.
-Commençons par créer les connexions entre les quais.
-```php
-MATCH(s1:Station)
-MATCH(s2:Station) WHERE s1.name=s2.name AND s1<>s2
-MERGE (s1)-[:MEMESTATION]->(s2)
-MERGE (s2)-[:MEMESTATION]->(s1)
-```
-
-### Liaisons à pied entre les stations
-Il existe des couloirs permettant de se déplacer d'une station à l'autre, cette information est dans le fichier `transfers.txt`.
-```php
-USING PERIODIC COMMIT 800
-LOAD CSV WITH HEADERS FROM "file:///RATP_GTFS_METRO_1/transfers.csv" as row
-MATCH (s1:Station{stop_id:toInteger(row.from_stop_id)})
-MATCH (s2:Station{stop_id:toInteger(row.to_stop_id)})
-MERGE (s1)-[:PIED{time:row.min_transfer_time}]->(s2)
-MERGE (s1)<-[:PIED{time:row.min_transfer_time}]-(s2)
-```
-
-### Liaisons entre les stations d'une même ligne
-Le fichier `stop_times.txt` est celui qui va nous interesser, chaque ligne du fichier est constituée de :
-trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,shape_dist_traveled
+Le fichier `stop_times.txt` contient l'ensemble des trajets effectués sur la ligne de métro.
 
 Un déplacement entre deux stations corresponds au passage d'une ligne du fichier à la suivante.
-Afin de simplifier le traitement, nous allons dand un premier temps enregistrer tous les arrêts à quai puis construire les déplacmeent entre deux quais.
+Afin de simplifier le traitement, nous allons dans un premier temps enregistrer tous les arrêts à quai puis construire les déplacement entre deux quais.
 
 Extraction des informations sur l'arrivée et le départ des trains à quai :
 ```php
@@ -82,9 +57,9 @@ SET t.trip_id = toInteger(row.trip_id),
 Nous pouvons maintenant construire le déplacement entre deux arrêts :
 ```php
 MATCH (t1:Travel)
-MATCH (t2:Travel) WHERE t1.trip_id = t2.trip_id AND t2.stop_sequence = t1.stop_sequence + 1
-MATCH (s1:Station) WHERE s1.stop_id = t1.stop_id
-MATCH (s2:Station) WHERE s2.stop_id = t2.stop_id
+MATCH (t2:Travel{trip_id:t1.trip_id}) WHERE t2.stop_sequence = t1.stop_sequence + 1
+MATCH (s1:Station) WHERE s1.stop_M1_1 = t1.stop_id OR s1.stop_M1_2 = t1.stop_id
+MATCH (s2:Station) WHERE s2.stop_M1_1 = t2.stop_id OR s2.stop_M1_2 = t2.stop_id
 MERGE (s1)-[m:M1]->(s2) 
 ON CREATE SET m.nb = 1, m.time = toFloat(t2.arrival_time-t1.departure_time)
 ON MATCH SET m.nb = m.nb + 1, m.time = m.time + t2.arrival_time-t1.departure_time
