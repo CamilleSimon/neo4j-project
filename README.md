@@ -34,10 +34,6 @@ La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
 
 ![Graph with all the stations](https://github.com/CamilleSimon/neo4j-project/blob/master/graph.png)
 
-OU ----------------------------------------------------------
-Lecture à partir de `stops.csv`
-
-
 ## Étape 2 - Ajout des connexions entre les stations
 Les exemples suivants sont appliqués sur la ligne 1 du métro, pour créer le plan complet du métro de Paris, il faut répéter l'opération pour chacune des lignes.
 
