@@ -2,7 +2,7 @@
 
 Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/) mais portant sur le métro parisien.
 
-[TODO : Meilleur intro ! => Rappel du contexte + rapide présentation du travail réalisé sur le métro de Londre + présentation des objectifs du travail. Séparer en plsueirus fichiers ? 1.Intro 2.Tuto 3.Exo ?]
+[TODO : Meilleur intro ! => Rappel du contexte + rapide présentation du travail réalisé sur le métro de Londre + présentation des objectifs du travail. Séparer en plusieurs fichiers ? 1.Intro 2.Tuto 3.Exo ?]
 
 ## Prérequis
 - [Neo4j](https://neo4j.com/download/)
@@ -10,7 +10,9 @@ Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://
 - Le plugin [APOC](http://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/3.4.0.1) //Nécessaire pour la conversion en format date et la future upgrade temps-réel 
 - Les informations sur l'[ensemble des lignes](http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip) du réseau RATP
 
-Les opérations suivantes sont à répéter pour chaque ligne de métro, nous ne présenterons que les commande pour la ligne 1.
+Le dossier RATP_GTFS_LINES contient un répertoire par ligne de transport. Nous allons ici présenter les commandes pour la ligne 1 du métro, pour obtenir le graphe de l'ensemble du réseau, il est nécessaire de répéter l'opération pour chaque ligne.
+
+[TODO : Regrouper les commandes du M1 dans un .cyper + proposer un script complet pour l'ensemble du réseau]
 
 ## Étape 1 - Ajout des stations
 On utilise le fichier `stops.csv` qui contient notamment les noms des stations ainsi que l'identifiant qui va nous aider à céer les connexions entre-elles : `stop_id`.
