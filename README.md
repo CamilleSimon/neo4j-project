@@ -63,8 +63,6 @@ MATCH (t2:Travel{trip_id:t1.trip_id}) WHERE t2.stop_sequence = t1.stop_sequence 
 MATCH (s1:Station) WHERE s1.stop_M1_1 = t1.stop_id
 MATCH (s2:Station) WHERE s2.stop_M1_1 = t2.stop_id
 MERGE (s1)-[m:M1]->(s2) 
-ON CREATE SET m.nb = 1, m.time = toFloat(t2.arrival_time-t1.departure_time)
-ON MATCH SET m.nb = m.nb + 1, m.time = m.time + t2.arrival_time-t1.departure_time
 ```
 ```php
 MATCH (t1:Travel)
@@ -72,8 +70,6 @@ MATCH (t2:Travel{trip_id:t1.trip_id}) WHERE t2.stop_sequence = t1.stop_sequence 
 MATCH (s1:Station) WHERE s1.stop_M1_1 = t1.stop_id
 MATCH (s2:Station) WHERE s2.stop_M1_2 = t2.stop_id
 MERGE (s1)-[m:M1]->(s2) 
-ON CREATE SET m.nb = 1, m.time = toFloat(t2.arrival_time-t1.departure_time)
-ON MATCH SET m.nb = m.nb + 1, m.time = m.time + t2.arrival_time-t1.departure_time
 ```
 ```php
 MATCH (t1:Travel)
@@ -81,8 +77,6 @@ MATCH (t2:Travel{trip_id:t1.trip_id}) WHERE t2.stop_sequence = t1.stop_sequence 
 MATCH (s1:Station) WHERE s1.stop_M1_2 = t1.stop_id
 MATCH (s2:Station) WHERE s2.stop_M1_1 = t2.stop_id
 MERGE (s1)-[m:M1]->(s2) 
-ON CREATE SET m.nb = 1, m.time = toFloat(t2.arrival_time-t1.departure_time)
-ON MATCH SET m.nb = m.nb + 1, m.time = m.time + t2.arrival_time-t1.departure_time
 ```
 ```php
 MATCH (t1:Travel)
@@ -90,8 +84,6 @@ MATCH (t2:Travel{trip_id:t1.trip_id}) WHERE t2.stop_sequence = t1.stop_sequence 
 MATCH (s1:Station) WHERE s1.stop_M1_2 = t1.stop_id
 MATCH (s2:Station) WHERE s2.stop_M1_2 = t2.stop_id
 MERGE (s1)-[m:M1]->(s2) 
-ON CREATE SET m.nb = 1, m.time = toFloat(t2.arrival_time-t1.departure_time)
-ON MATCH SET m.nb = m.nb + 1, m.time = m.time + t2.arrival_time-t1.departure_time
 ```
 
 *Remarque 1* : Impossible d'utiliser une version factorisée du code !
@@ -101,11 +93,9 @@ MATCH (t2:Travel{trip_id:t1.trip_id}) WHERE t2.stop_sequence = t1.stop_sequence 
 MATCH (s1:Station) WHERE s1.stop_M1_1 = t1.stop_id OR s1.stop_M1_2 = t1.stop_id
 MATCH (s2:Station) WHERE s2.stop_M1_1 = t2.stop_id OR s2.stop_M1_2 = t2.stop_id
 MERGE (s1)-[m:M1]->(s2) 
-ON CREATE SET m.nb = 1, m.time = toFloat(t2.arrival_time-t1.departure_time)
-ON MATCH SET m.nb = m.nb + 1, m.time = m.time + t2.arrival_time-t1.departure_time
 ```
 
-*Remarque 2*: 
+*Remarque 2* : 
 Il est possible de connaitre le temps moyen de parcours entre deux stations avec à la création : 
 ```php
 ON CREATE SET m.nb = 1, m.time = toFloat(t2.arrival_time-t1.departure_time)
