@@ -1,8 +1,8 @@
-# Neo4j-project
+# Neo4j - Project réseaux d'intéraction
 
-Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/) mais portant sur le métro parisien.
+Le but de ce projet est de réaliser une base de donnée orienté graphe représentant le métro parisien. Pour effectuer se travail, nous allons nous inspirer de ce qui a été fait avec [le métro de Londre](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/).
 
-[TODO : Meilleur intro ! => Rappel du contexte + rapide présentation du travail réalisé sur le métro de Londre + présentation des objectifs du travail. Séparer en plusieurs fichiers ? 1.Intro 2.Tuto 3.Exo ?]
+# Création du graphe
 
 ## Prérequis
 - [Neo4j](https://neo4j.com/download/)
@@ -12,15 +12,13 @@ Le but de ce projet est de réaliser un travail similaire à [celui-ci](https://
 
 Le dossier RATP_GTFS_LINES contient un répertoire par ligne de transport. Nous allons ici présenter les commandes pour la ligne 1 du métro, pour obtenir le graphe de l'ensemble du réseau, il est nécessaire de répéter l'opération pour chaque ligne.
 
-[TODO : Regrouper les commandes du M1 dans un .cyper + proposer un script complet pour l'ensemble du réseau]
-
 ## Étape 1 - Ajout des stations
 On utilise le fichier `stops.csv` qui contient notamment les noms des stations ainsi que l'identifiant qui va nous aider à céer les connexions entre-elles : `stop_id`.
 
 Chaque ligne du document correspond à un quai de métro, il y a deux quais sur une voie, un pour chaque sens de circulation. Un noeud dans notre graphe est donc un nom et un ensemble d'identifiant de quai. Pour créer les noeuds, on utilise le script suivant :
 ```php
 LOAD CSV WITH HEADERS FROM "file:///RATP_GTFS_METRO_1/stops.csv" as row
-MERGE (s:Station{name:row.name})
+MERGE (s:Station{name:row.stop_name})
 ON CREATE SET s.stop_M1_1 = toInteger(row.stop_id),
     s.name = row.stop_name,
     s.address = row.stop_desc,
@@ -31,9 +29,9 @@ ON CREATE SET s.stop_M1_1 = toInteger(row.stop_id),
     s.departement = row.departement
 ON MATCH SET s.stop_M1_2 = toInteger(row.stop_id)
 ```
+*Note* : Nous avons ajouté 25 stations, il serai interessant de pourvoir stocker cette information par exemple dans un noeud spécial `MATCH(s:Station) WHERE s.stop_M1_1 > 0 MERGE (n:Data) SET n.nbStationM1 = count(s)`
 
 La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
-
 
 ![Graph with all the stations](https://github.com/CamilleSimon/neo4j-project/blob/master/graph.png)
 
@@ -95,6 +93,8 @@ MATCH (s2:Station) WHERE s2.stop_M1_1 = t2.stop_id OR s2.stop_M1_2 = t2.stop_id
 MERGE (s1)-[m:M1]->(s2) 
 ```
 
+[TODO : calcul de complexité en nombre d'opération]
+
 *Remarque 2* : 
 Il est possible de connaitre le temps moyen de parcours entre deux stations avec à la création : 
 ```php
@@ -114,23 +114,13 @@ La commande `MATCH (n)-[:M1]-(m) RETURN n,m` nous permet de visualiser la ligne 
 *Remarque* : 
 
 Sur certain trajet, le métro ne fait pas toutes les stations, on a alors la création de "triangulaire". Doit-on tout représenter ou seulement le chemin le plus long en nombre d'arrête ?
+
 Ex : A-->C, A-->B, B-->C. Eliminer A-->B et B-->C ?
-Si on veut dans l'avenir calculer le temps de trajet entre deux stations, il est nécessaire de garder tous les trajets ainsi que leurs horaires de passages mais le graphe est moins lisible. 
 
-Avec la commande suivante, on supprime les liaisons A-->C (triangulaire) :
-```php
-MATCH (n1:Station)-[p1:M1]->(m1:Station)
-MATCH (n2:Station)-[p2:M1*2]->(m2:Station) WHERE n1=n2 AND m1=m2
-DELETE p1
-```
-
-En généralisant pour toute les liaisons "n-aire", on obtient le graphe suivant :
-
-![Graph of M1 simplified](https://github.com/CamilleSimon/neo4j-project/blob/master/graph-metro1-2.png)
+Si l'on veut, dans l'avenir, calculer le temps de trajet entre deux stations, il est nécessaire de garder tous les trajets ainsi que leurs horaires de passages mais cela rend le graphe moins lisible. 
 
 ## Idées d'amélioration
 - Ajouter les heures de départ et d'arrivée afin de prendre en compte les temps des correspondances
-- Fusionner les `stop_id` dans une liste. Chaque station aurait un nom unique et une liste de `stop_id`
 - Que faire des triangulaires ? 
 
 ## Références
