@@ -2,8 +2,6 @@
 
 Le but de ce projet est de réaliser une base de donnée orienté graphe représentant le métro parisien. Pour effectuer se travail, nous allons nous inspirer de ce qui a été fait avec [le métro de Londre](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/).
 
-# Création du graphe
-
 ## Prérequis
 - [Neo4j](https://neo4j.com/download/)
 - Le plugin [Graph algorithms](https://github.com/neo4j-contrib/neo4j-graph-algorithms/)
