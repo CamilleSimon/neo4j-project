@@ -31,6 +31,15 @@ ON MATCH SET s.stop_M1_2 = toInteger(row.stop_id)
 ```
 *Note* : Nous avons ajouté 25 stations, il serai interessant de pourvoir stocker cette information par exemple dans un noeud spécial `MATCH(s:Station) WHERE s.stop_M1_1 > 0 MERGE (n:Data) SET n.nbStationM1 = count(s)`
 
+*Edit* : Possible avec APOC ? A tester =>
+```php
+MATCH (user:User)
+WHERE user.Id = 1234
+WITH user, size((user)-[:IS_FRIENDS_WITH]->(:Friend)) as numberOfFriends
+CALL apoc.map.setKey(user, 'numberOfFriends', numberOfFriends) YIELD value AS userWithFriends
+RETURN userWithFriends
+```
+
 La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
 
 ![Graph with all the stations](https://github.com/CamilleSimon/neo4j-project/blob/master/graph.png)
