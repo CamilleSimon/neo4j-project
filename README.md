@@ -1,11 +1,11 @@
-# Neo4j - Project réseaux d'intéraction
+# Neo4j - Projet réseaux d'intéraction
 
-Le but de ce projet est de réaliser une base de donnée orienté graphe représentant le métro parisien. Pour effectuer se travail, nous allons nous inspirer de ce qui a été fait avec [le métro de Londre](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/).
+Le but de ce projet est de réaliser une base de donnée orientée graphe représentant le métro parisien. Pour effectuer ce travail, nous allons nous inspirer de ce qui a été fait avec [le métro de Londre](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/).
 
 ## Prérequis
 - [Neo4j](https://neo4j.com/download/)
 - Le plugin [Graph algorithms](https://github.com/neo4j-contrib/neo4j-graph-algorithms/)
-- Le plugin [APOC](http://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/3.4.0.1) //Nécessaire pour la conversion en format date et la future upgrade temps-réel 
+- Le plugin [APOC](http://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/3.4.0.1) (*Nécessaire pour la conversion en format date et la future upgrade temps-réel*)
 - Les informations sur l'[ensemble des lignes](http://dataratp.download.opendatasoft.com/RATP_GTFS_LINES.zip) du réseau RATP
 
 Le dossier RATP_GTFS_LINES contient un répertoire par ligne de transport. Nous allons ici présenter les commandes pour la ligne 1 du métro, pour obtenir le graphe de l'ensemble du réseau, il est nécessaire de répéter l'opération pour chaque ligne.
@@ -27,7 +27,7 @@ ON CREATE SET s.stop_M1_1 = toInteger(row.stop_id),
     s.departement = row.departement
 ON MATCH SET s.stop_M1_2 = toInteger(row.stop_id)
 ```
-*Note* : Nous avons ajouté 25 stations, il serai interessant de pourvoir stocker cette information par exemple dans un noeud spécial `MATCH(s:Station) WHERE s.stop_M1_1 > 0 MERGE (n:Data) SET n.nbStationM1 = count(s)`
+*Note* : Nous avons ajouté 25 stations, il serai interessant de pourvoir stocker cette information par exemple dans un noeud spécial `MATCH(s:Station) WHERE s.stop_M1_1 > 0 MERGE (n:Data) SET n.nbStationM1 = count(s)` (*Ne fonctionne pas*)
 
 *Edit* : Possible avec APOC ? A tester =>
 ```php
@@ -47,7 +47,7 @@ La commande `MATCH (n) RETURN n` permet de visualiser l'état actuel du graphe :
 Le fichier `stop_times.txt` contient l'ensemble des trajets effectués sur la ligne de métro.
 
 Un déplacement entre deux stations corresponds au passage d'une ligne du fichier à la suivante.
-Afin de simplifier le traitement, nous allons dans un premier temps enregistrer tous les arrêts à quai puis construire les déplacement entre deux quais.
+Afin de simplifier le traitement, nous allons dans un premier temps enregistrer tous les arrêts à quai puis construire les déplacements entre deux quais.
 
 Extraction des informations sur l'arrivée et le départ des trains à quai :
 ```php
@@ -103,7 +103,7 @@ MERGE (s1)-[m:M1]->(s2)
 [TODO : calcul de complexité en nombre d'opération]
 
 *Remarque 2* : 
-Il est possible de connaitre le temps moyen de parcours entre deux stations avec à la création : 
+Il est possible de connaitre le temps moyen de parcours entre deux stations en ajoutant le code suivant au script de création des trajets : 
 ```php
 ON CREATE SET m.nb = 1, m.time = toFloat(t2.arrival_time-t1.departure_time)
 ON MATCH SET m.nb = m.nb + 1, m.time = m.time + t2.arrival_time-t1.departure_time
@@ -127,7 +127,7 @@ Ex : A-->C, A-->B, B-->C. Eliminer A-->B et B-->C ?
 Si l'on veut, dans l'avenir, calculer le temps de trajet entre deux stations, il est nécessaire de garder tous les trajets ainsi que leurs horaires de passages mais cela rend le graphe moins lisible. 
 
 ## Idées d'amélioration
-- Ajouter les heures de départ et d'arrivée afin de prendre en compte les temps des correspondances
+- Ajouter les heures de départ et d'arrivée afin de prendre en compte les horaires pour les correspondances
 - Que faire des triangulaires ? 
 
 ## Références
