@@ -1,6 +1,6 @@
 # Neo4j - Projet réseaux d'intéraction
 
-Le but de ce projet est de réaliser une base de donnée orientée graphe représentant le métro parisien. Pour effectuer ce travail, nous allons nous inspirer de ce qui a été fait avec [le métro de Londre](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/).
+Le but de ce projet est de réaliser une base de données orientée graphe représentant le métro parisien. Pour effectuer ce travail, nous allons nous inspirer de ce qui a été fait avec [le métro de Londre](https://tbgraph.wordpress.com/2017/08/31/neo4j-london-tube-system-analysis/).
 
 ## Prérequis
 - [Neo4j](https://neo4j.com/download/)
